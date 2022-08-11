@@ -2,7 +2,7 @@ from multiprocessing import context
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import *
-from .forms import OrderForm, CustomerForm
+from .forms import OrderForm, CustomerForm,UpdateOrder
 
 def home(request):
     customers  = Customer.objects.all()
@@ -51,4 +51,29 @@ def createCustomer(request):
 
     context = {'form':form}
     return render(request, 'accounts/create_customer.html', context)
+
+
+def updateOrder(request, pk):
+
+    order = Order.objects.get(id = pk)
+    form = UpdateOrder(instance=order)
+    if request.method == 'POST':
+        form = UpdateOrder(request.POST, instance=order)
+        if form.is_valid():
+            form.save()
+            return redirect('/')
+
+    context = {'form':form}
+    return render(request, 'accounts/create_order.html', context)
+
+def deleteOrder(request, pk):
+
+    order = Order.objects.get(id = pk)
+    if request.method == 'POST':
+        order.delete()
+        return redirect('/')
+    
+    context = {'item':order}
+    return render(request, 'accounts/delete_order.html', context)
+
 
